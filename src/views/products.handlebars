@@ -1,0 +1,65 @@
+<div class="container">
+    <h1>📚 Lista de Productos</h1>
+
+    <form action="/products" method="GET" class="filter-form">
+        <label for="limit">Límite:</label>
+        <input type="number" name="limit" value="{{currentQuery.limit}}" min="1">
+
+        <label for="query">Filtrar (Categoría o 'true'/'false' para Status):</label>
+        <input type="text" name="query" value="{{currentQuery.query}}">
+
+        <label for="sort">Ordenar por Precio:</label>
+        <select name="sort">
+            <option value="">Sin orden</option>
+            <option value="asc" {{#if (eq currentQuery.sort "asc")}}selected{{/if}}>Ascendente (Menor a Mayor)</option>
+            <option value="desc" {{#if (eq currentQuery.sort "desc")}}selected{{/if}}>Descendente (Mayor a Menor)</option>
+        </select>
+        
+        <button type="submit">Aplicar Filtros</button>
+        <a href="/products">Limpiar Filtros</a>
+    </form>
+
+    <hr>
+
+    {{#if payload}}
+    <div class="product-grid">
+        {{#each payload}}
+        <div class="product-card">
+            <h3>{{title}}</h3>
+            <p><strong>Precio:</strong> ${{price}}</p>
+            <p><strong>Categoría:</strong> {{category}}</p>
+            <p><strong>Stock:</strong> {{stock}}</p>
+            
+            <a href="/products/{{_id}}" class="btn-detail">Ver Detalle</a>
+            
+            <button class="btn-add-cart" data-product-id="{{_id}}">Agregar al Carrito</button>
+        </div>
+        {{/each}}
+    </div>
+
+    <div class="pagination-controls">
+        {{#if hasPrevPage}}
+        <a href="/products?page={{prevPage}}{{#if currentQuery.limit}}&limit={{currentQuery.limit}}{{/if}}{{#if currentQuery.sort}}&sort={{currentQuery.sort}}{{/if}}{{#if currentQuery.query}}&query={{currentQuery.query}}{{/if}}" class="btn">Página Previa</a>
+        {{/if}}
+
+        <span>Página {{page}} de {{totalPages}}</span>
+        
+        {{#if hasNextPage}}
+        <a href="/products?page={{nextPage}}{{#if currentQuery.limit}}&limit={{currentQuery.limit}}{{/if}}{{#if currentQuery.sort}}&sort={{currentQuery.sort}}{{/if}}{{#if currentQuery.query}}&query={{currentQuery.query}}{{/if}}" class="btn">Página Siguiente</a>
+        {{/if}}
+    </div>
+    {{else}}
+    <p>No se encontraron productos.</p>
+    {{/if}}
+</div>
+
+<style>
+    .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .filter-form { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; border: 1px solid #ccc; padding: 10px; border-radius: 5px; }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+    .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+    .product-card h3 { margin-top: 0; }
+    .pagination-controls { text-align: center; margin-top: 30px; display: flex; justify-content: center; gap: 20px; align-items: center; }
+    .btn { padding: 8px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; }
+    .btn-add-cart { background-color: #28a745; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+</style>

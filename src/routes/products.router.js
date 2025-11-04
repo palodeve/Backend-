@@ -1,50 +1,63 @@
-import { Router } from 'express';
-import ProductManager from '../productManager.js';
 
+import { Router } from 'express';
+//import Product from '../models/product.model.js'; 
+import Product from '../models/product.models.js'; 
 const router = Router();
-const pm = new ProductManager('./src/data/products.json');
 
 router.get('/', async (req, res) => {
   try {
-    const products = await pm.getProducts();
-    res.json(products);
+    const { limit = 10, page = 1, sort, query } = req.query; 
+    const options = {
+      limit: parseInt(limit),
+      page: parseInt(page),
+      sort: sort ? { price: sort === 'asc' ? 1 : -1 } : {}, 
+      lean: true, 
+    };
+
+    const filter = {}; 
+    if (query) {
+      
+      const isAvailable = query.toLowerCase() === 'true' || query.toLowerCase() === 'false';
+
+      if (isAvailable) {
+       
+        filter.status = query.toLowerCase() === 'true';
+      } else {
+    
+        filter.category = query;
+      }
+    }
+
+    const result = await Product.paginate(filter, options); // Usar paginate
+
+    // Crear links de paginación
+    const baseUrl = req.protocol + '://' + req.get('host') + req.originalUrl.split('?')[0];
+    const buildLink = (p) => {
+      const params = new URLSearchParams(req.query);
+      params.set('page', p);
+      return `${baseUrl}?${params.toString()}`;
+    };
+
+    const response = {
+      status: 'success',
+      payload: result.docs,
+      totalPages: result.totalPages,
+      prevPage: result.prevPage,
+      nextPage: result.nextPage,
+      page: result.page,
+      hasPrevPage: result.hasPrevPage,
+      hasNextPage: result.hasNextPage,
+      prevLink: result.hasPrevPage ? buildLink(result.prevPage) : null,
+      nextLink: result.hasNextPage ? buildLink(result.nextPage) : null,
+    };
+
+    res.json(response);
+
   } catch (err) {
-    res.status(500).json({ error: 'Error del servidor' });
+    console.error("Error al obtener productos:", err);
+    res.status(500).json({ status: 'error', error: 'Error del servidor' });
   }
 });
 
-router.get('/:pid', async (req, res) => {
-  const p = await pm.getProductById(req.params.pid);
-  if (!p) return res.status(404).json({ error: 'Producto no encontrado' });
-  res.json(p);
-});
-
-router.post('/', async (req, res) => {
-  try {
-    const newP = await pm.addProduct(req.body);
-    res.status(201).json(newP);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-router.put('/:pid', async (req, res) => {
-  try {
-    const updated = await pm.updateProduct(req.params.pid, req.body);
-    if (!updated) return res.status(404).json({ error: 'Producto no encontrado' });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-router.delete('/:pid', async (req, res) => {
-  try {
-    await pm.deleteProduct(req.params.pid);
-    res.json({ message: 'Producto eliminado' });
-  } catch (err) {
-    res.status(500).json({ error: 'Error al eliminar' });
-  }
-});
 
 export default router;

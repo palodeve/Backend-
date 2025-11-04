@@ -1,0 +1,33 @@
+<div class="container">
+    <a href="/products">← Volver al listado de productos</a>
+
+    <h1>✨ Detalle del Producto: {{product.title}}</h1>
+    <div class="detail-container">
+        <div class="product-image">
+            <img src="{{#if product.thumbnails}}{{product.thumbnails.[0]}}{{else}}{{/if}}" alt="{{product.title}}" style="max-width: 100%;">
+        </div>
+        <div class="product-info">
+            <p><strong>Descripción:</strong> {{product.description}}</p>
+            <p><strong>Precio:</strong> <span class="price">${{product.price}}</span></p>
+            <p><strong>Código:</strong> {{product.code}}</p>
+            <p><strong>Categoría:</strong> {{product.category}}</p>
+            <p><strong>Stock:</strong> {{product.stock}}</p>
+            <p><strong>Disponibilidad:</strong> 
+                {{#if product.status}}
+                    <span style="color: green;">Disponible</span>
+                {{else}}
+                    <span style="color: red;">Agotado</span>
+                {{/if}}
+            </p>
+
+            <button class="btn-add-cart-detail" data-product-id="{{product._id}}">Agregar al Carrito</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .detail-container { display: flex; gap: 40px; margin-top: 20px; }
+    .product-info { flex: 1; }
+    .price { font-size: 1.5em; font-weight: bold; color: #dc3545; }
+    .btn-add-cart-detail { background-color: #ffc107; color: black; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; font-size: 1.1em; }
+</style>

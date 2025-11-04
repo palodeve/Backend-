@@ -1,0 +1,37 @@
+<div class="container">
+    <h1>🛒 Contenido del Carrito ID: {{cart._id}}</h1>
+
+    {{#if cart.products}}
+        <ul class="cart-list">
+        {{#each cart.products}}
+            <li class="cart-item">
+                <div class="item-info">
+                    <h3>{{product.title}}</h3>
+                    <p>ID: {{product._id}}</p>
+                    <p>Precio Unitario: ${{product.price}}</p>
+                </div>
+                <div class="item-controls">
+                    <p><strong>Cantidad:</strong> {{quantity}}</p>
+                    <p><strong>Subtotal:</strong> ${{multiply product.price quantity}}</p>
+                    
+                    <button class="btn-remove" data-cart-id="{{../cart._id}}" data-product-id="{{product._id}}">Eliminar</button>
+
+                    </div>
+            </li>
+        {{/each}}
+        </ul>
+        
+        <button class="btn-clear-cart" data-cart-id="{{cart._id}}">Vaciar Carrito</button>
+    {{else}}
+        <p>Tu carrito está vacío.</p>
+    {{/if}}
+</div>
+
+<style>
+    .cart-list { list-style: none; padding: 0; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 15px 0; }
+    .item-info { flex: 2; }
+    .item-controls { flex: 1; text-align: right; }
+    .btn-remove { background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+    .btn-clear-cart { background-color: #ffc107; color: black; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 20px; }
+</style>
